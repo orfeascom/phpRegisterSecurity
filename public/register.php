@@ -3,7 +3,7 @@ require "../private/autoload.php";
 $errors = array('email'=>'','username'=>'','password'=>'');
 $email = $username = "";
 
-if($_SERVER['REQUEST_METHOD'] == "POST")
+if($_SERVER['REQUEST_METHOD'] == "POST" && isset($_SESSION['token']) && isset($_POST['token']) && $_SESSION['token'] == $_POST['token'])
 {
     $email = $_POST['email'];
     $username = $_POST['username'];
@@ -39,7 +39,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
             //valid email and username
             $arr['email'] = esc($email);
             $arr['username'] = esc($username);
-            $arr['password'] = esc($password);
+            $arr['password'] = password_hash($password, PASSWORD_DEFAULT);;
 
             $query = "INSERT INTO users_secure (email,username,password) VALUES (:email,:username,:password)";
             $stmt = $conn->prepare($query);
@@ -50,6 +50,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         }
     }
 }
+
+//CSRF Token for our form
+$_SESSION['token'] = get_random_token();
 ?>
 
 <html lang="en">
@@ -85,6 +88,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
         <div style="color: red"><?php echo $errors['username'] ?></div>
         <input id="textbox" type="text" name="username" placeholder="Username" value="<?=$username?>"required>
         <input id="textbox" type="password" name="password" placeholder="Password" required>
+        <input type="hidden" name="token" value="<?=$_SESSION['token']?>">
         <input style="margin-top: 4px" type="submit" name="Sign up">
     </form>
 </body>

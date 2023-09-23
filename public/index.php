@@ -1,7 +1,7 @@
 <?php
 
 require "../private/autoload.php";
-check_login();
+//check_login();
 
 ?>
 
@@ -12,7 +12,13 @@ check_login();
     <title>Home</title>
 </head>
 <body>
-    <h4>This is the home page</h4>
-    <p>Hello <?=$_SESSION['username']?></p>
+    <div style="float:right"><a href="logout.php">Logout</a></div>
+    <h3>This is the home page</h3>
+    <?php if(check_login()): ?>
+        <p>Hello <?=htmlspecialchars($_SESSION['username'])?></p>
+    <?php else: ?>
+        <p style="text-align:center">You need to <a href="login.php">login in</a> first!</p>
+    <?php endif; ?>
+
 </body>
 </html>
