@@ -1,12 +1,34 @@
 <?php
 require "../private/autoload.php";
-$error = "";
+$errors = array('email'=>'','username'=>'','password'=>'');
 
-if($_SERVER['REQUEST_METHOD'] == "POST"){
+if($_SERVER['REQUEST_METHOD'] == "POST")
+{
     $email = $_POST['email'];
+    $username = $_POST['username'];
     $password = $_POST['password'];
-    if(!preg_match("/^[\w\-]+@[\w\-]+.[\w]+$/", $email)){
-        $error = "Please enter a valid email...";
+    if(!preg_match("/^[\w\-]+@[\w\-]+.[\w]+$/", $email))
+    {
+        $errors['email'] = "Please enter a valid email...";
+    } else 
+    {
+        if(!preg_match("/^[\w\_]+$/", $username))
+        {
+            $errors['username'] = "Please enter a valid username";
+        } else 
+        {
+            //valid email and username
+            $arr['email'] = esc($email);
+            $arr['username'] = esc($username);
+            $arr['password'] = esc($password);
+
+            $query = "INSERT INTO users_secure (email,username,password) VALUES (:email,:username,:password)";
+            $stmt = $conn->prepare($query);
+            $stmt->execute($arr);
+
+            header("Location: login.php");
+            die;
+        }
     }
 }
 ?>
@@ -39,9 +61,11 @@ if($_SERVER['REQUEST_METHOD'] == "POST"){
     </style>
     <form action="" method="POST">
         <div id="title">Signup</div>
-        <div style="color: red"><?php echo "$error" ?></div>
-        <input id="textbox" type="email" name="email" required>
-        <input id="textbox" type="password" name="password" required>
+        <div style="color: red"><?php echo $errors['email'] ?></div>
+        <input id="textbox" type="email" name="email" placeholder="Email address" required>
+        <div style="color: red"><?php echo $errors['username'] ?></div>
+        <input id="textbox" type="text" name="username" placeholder="Username" required>
+        <input id="textbox" type="password" name="password" placeholder="Password" required>
         <input style="margin-top: 4px" type="submit" name="Sign up">
     </form>
 </body>
