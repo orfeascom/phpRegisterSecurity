@@ -1,6 +1,7 @@
 <?php
 require "../private/autoload.php";
 $errors = array('email'=>'','username'=>'','password'=>'');
+$email = $username = "";
 
 if($_SERVER['REQUEST_METHOD'] == "POST")
 {
@@ -11,6 +12,24 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     {
         $errors['email'] = "Please enter a valid email...";
     } else 
+    {
+        $arr = false;
+        $arr['email'] = $email;
+        $query = "SELECT * FROM users_secure WHERE email = :email limit 1";
+        $stmt = $conn->prepare($query);
+        if($stmt->execute($arr))
+        {
+            $data = $stmt->fetchALL(PDO::FETCH_OBJ);
+            if(is_array($data) && count($data) > 0)
+            {
+                $errors['email'] = "Email already in use...";
+            }
+        }
+
+    }
+
+    //Valid email
+    if($errors['email'] == "")
     {
         if(!preg_match("/^[\w\_]+$/", $username))
         {
@@ -62,9 +81,9 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     <form action="" method="POST">
         <div id="title">Signup</div>
         <div style="color: red"><?php echo $errors['email'] ?></div>
-        <input id="textbox" type="email" name="email" placeholder="Email address" required>
+        <input id="textbox" type="email" name="email" placeholder="Email address" value="<?=$email?>"required>
         <div style="color: red"><?php echo $errors['username'] ?></div>
-        <input id="textbox" type="text" name="username" placeholder="Username" required>
+        <input id="textbox" type="text" name="username" placeholder="Username" value="<?=$username?>"required>
         <input id="textbox" type="password" name="password" placeholder="Password" required>
         <input style="margin-top: 4px" type="submit" name="Sign up">
     </form>

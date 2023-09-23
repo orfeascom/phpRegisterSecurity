@@ -1,6 +1,7 @@
 <?php
 
 require "../private/autoload.php";
+check_login();
 
 ?>
 
@@ -12,5 +13,6 @@ require "../private/autoload.php";
 </head>
 <body>
     <h4>This is the home page</h4>
+    <p>Hello <?=$_SESSION['username']?></p>
 </body>
 </html>
